@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Batch QR Generator — mdothree</title>
+  <meta name="description" content="Generate multiple QR codes from a list. Download all as a ZIP file." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mdothree.com/batch" />
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Batch QR Generator — mdothree" />
+  <meta property="og:description" content="Generate multiple QR codes from a list. Download all as a ZIP file." />
+  <meta property="og:url"         content="https://mdothree.com/batch" />
+  <meta property="og:site_name"   content="mdothree" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Batch QR Generator — mdothree" />
+  <meta name="twitter:description" content="Generate multiple QR codes from a list. Download all as a ZIP file." />
+  <!-- PWA -->
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  
+  <!-- DNS prefetch / preconnect for external resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://js.stripe.com" crossorigin />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">m<span class="dot">.</span>three <span style="color:var(--slate-600);margin-left:8px;font-size:0.7rem;">/ qr</span></a>
+      <ul class="nav-links">
+        <li><a href="generate.html">Generate</a></li>
+        <li><a href="scan.html">Scan / Decode</a></li>
+        <li><a href="batch.html" class="active">Batch</a></li>
+        <li style="margin-left:auto;"><a href="pricing.html">Pricing</a></li>
+        <li><a href="account.html">Account</a></li>
+      </ul>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+  </nav>
+
+  <main class="tool-page" id="main-content">
+    <div class="container">
+      <div class="tool-header animate-fade-up">
+        <div class="breadcrumb"><a href="index.html">QR Tools</a><span>/</span> Batch</div>
+        <h1>📋 Batch QR Generator</h1>
+        <p>Paste a list of URLs or text (one per line) to generate multiple QR codes at once.</p>
+      </div>
+
+      <div class="alert alert-info animate-fade-up" id="freeBanner" style="margin-bottom:20px;">
+        ℹ️ <strong>Free plan:</strong> Generate up to 5 QR codes at once. <a href="#" onclick="requirePremium('Batch QR generation','qr-batch');return false;" style="color:var(--emerald);text-decoration:none;margin-left:8px;">Upgrade for 1,000+ →</a>
+      </div>
+      <div class="tool-layout" class="animate-fade-up-2">
+        <div>
+          <div class="panel">
+            <div class="panel-title">Input</div>
+            <div class="form-group">
+              <label class="form-label">One item per line</label>
+              <textarea class="form-textarea" id="batchInput" style="min-height:240px;" placeholder="https://example.com&#10;https://google.com&#10;https://github.com&#10;Hello World"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group">
+                <label class="form-label">Foreground</label>
+                <input type="color" id="fgColor" value="#000000" style="width:100%;height:36px;" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Background</label>
+                <input type="color" id="bgColor" value="#ffffff" style="width:100%;height:36px;" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Size per QR code</label>
+              <select class="form-select" id="qrSize">
+                <option value="256">256px</option>
+                <option value="512" selected>512px</option>
+                <option value="1024">1024px</option>
+              </select>
+            </div>
+            <button class="btn btn-primary w-full" id="generateBtn">▦ Generate All QR Codes</button>
+          </div>
+        </div>
+
+        <div>
+          <div id="progressWrap" class="hidden panel">
+            <div class="panel-title">Generating...</div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+            <p class="text-sm text-muted mt-8" id="progressLabel"></p>
+          </div>
+
+          <div id="previewGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"></div>
+
+          <div id="downloadAllWrap" class="hidden mt-16">
+            <button class="btn btn-primary w-full" id="downloadAll">⬇️ Download All as ZIP</button>
+          </div>
+        </div>
+      </div>
+      <div id="alertArea" class="mt-16"></div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="footer-inner"><div class="footer-copy">© 2024 mdothree.com</div></div></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  
+  <script type="module" src="js/pages/batch.js"></script>
+  <script src="js/nav-toggle.js"></script>
+</body>
+</html>

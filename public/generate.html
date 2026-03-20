@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generate QR Code — mdothree</title>
+  <meta name="description" content="Create custom QR codes for URLs, WiFi networks, contacts, email, and SMS. Download as PNG or SVG." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mdothree.com/generate" />
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Generate QR Code — mdothree" />
+  <meta property="og:description" content="Create custom QR codes for URLs, WiFi networks, contacts, email, and SMS. Download as PNG or SVG." />
+  <meta property="og:url"         content="https://mdothree.com/generate" />
+  <meta property="og:site_name"   content="mdothree" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Generate QR Code — mdothree" />
+  <meta name="twitter:description" content="Create custom QR codes for URLs, WiFi networks, contacts, email, and SMS. Download as PNG or SVG." />
+  <!-- PWA -->
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  
+  <!-- DNS prefetch / preconnect for external resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://js.stripe.com" crossorigin />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">m<span class="dot">.</span>three <span style="color:var(--slate-600);margin-left:8px;font-size:0.7rem;">/ qr</span></a>
+      <ul class="nav-links">
+        <li><a href="generate.html" class="active">Generate</a></li>
+        <li><a href="scan.html">Scan / Decode</a></li>
+        <li><a href="batch.html">Batch</a></li>
+        <li style="margin-left:auto;"><a href="pricing.html">Pricing</a></li>
+        <li><a href="account.html">Account</a></li>
+      </ul>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+  </nav>
+
+  <main class="tool-page" id="main-content">
+    <div class="container">
+      <div class="tool-header animate-fade-up">
+        <div class="breadcrumb"><a href="index.html">QR Tools</a><span>/</span> Generate</div>
+        <h1>▦ Generate QR Code</h1>
+        <p>Create customized QR codes for any content type.</p>
+      </div>
+
+      <div class="tool-layout" class="animate-fade-up-2">
+        <!-- Left: Input -->
+        <div>
+          <div class="panel">
+            <div class="panel-title">Content Type</div>
+            <div class="tabs" style="flex-wrap:wrap;">
+              <button class="tab-btn active" data-type="url">URL</button>
+              <button class="tab-btn" data-type="text">Text</button>
+              <button class="tab-btn" data-type="wifi">WiFi</button>
+              <button class="tab-btn" data-type="vcard">vCard</button>
+              <button class="tab-btn" data-type="email">Email</button>
+              <button class="tab-btn" data-type="sms">SMS</button>
+            </div>
+
+            <!-- URL -->
+            <div id="typeUrl">
+              <div class="form-group">
+                <label class="form-label">URL</label>
+                <input type="url" class="form-input" id="urlInput" placeholder="https://example.com" />
+              </div>
+            </div>
+
+            <!-- Text -->
+            <div id="typeText" class="hidden">
+              <div class="form-group">
+                <label class="form-label">Text</label>
+                <textarea class="form-textarea" id="textInput" placeholder="Enter any text..."></textarea>
+              </div>
+            </div>
+
+            <!-- WiFi -->
+            <div id="typeWifi" class="hidden">
+              <div class="form-group">
+                <label class="form-label">Network Name (SSID)</label>
+                <input type="text" class="form-input" id="wifiSSID" placeholder="MyWiFi" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="text" class="form-input" id="wifiPass" placeholder="password123" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Security</label>
+                <select class="form-select" id="wifiSec">
+                  <option value="WPA">WPA/WPA2</option>
+                  <option value="WEP">WEP</option>
+                  <option value="nopass">None</option>
+                </select>
+              </div>
+              <div class="toggle-group">
+                <label class="toggle"><input type="checkbox" id="wifiHidden" /><span class="toggle-slider"></span></label>
+                <span class="toggle-label">Hidden network</span>
+              </div>
+            </div>
+
+            <!-- vCard -->
+            <div id="typeVcard" class="hidden">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" id="vcFirst" /></div>
+                <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" id="vcLast" /></div>
+              </div>
+              <div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-input" id="vcPhone" /></div>
+              <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="vcEmail" /></div>
+              <div class="form-group"><label class="form-label">Organization</label><input type="text" class="form-input" id="vcOrg" /></div>
+              <div class="form-group"><label class="form-label">Website</label><input type="url" class="form-input" id="vcUrl" /></div>
+            </div>
+
+            <!-- Email -->
+            <div id="typeEmail" class="hidden">
+              <div class="form-group"><label class="form-label">To</label><input type="email" class="form-input" id="emailTo" /></div>
+              <div class="form-group"><label class="form-label">Subject</label><input type="text" class="form-input" id="emailSubject" /></div>
+              <div class="form-group"><label class="form-label">Body</label><textarea class="form-textarea" id="emailBody" style="min-height:80px;"></textarea></div>
+            </div>
+
+            <!-- SMS -->
+            <div id="typeSms" class="hidden">
+              <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" class="form-input" id="smsPhone" /></div>
+              <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" id="smsMsg" style="min-height:80px;"></textarea></div>
+            </div>
+          </div>
+
+          <div class="panel mt-16">
+            <div class="panel-title">Appearance</div>
+            <div class="tool-layout">
+              <div class="form-group">
+                <label class="form-label">Foreground color</label>
+                <div class="color-input-group">
+                  <input type="color" id="fgColor" value="#000000" />
+                  <input type="text" class="form-input" id="fgColorHex" value="#000000" style="width:100px;" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Background color</label>
+                <div class="color-input-group">
+                  <input type="color" id="bgColor" value="#ffffff" />
+                  <input type="text" class="form-input" id="bgColorHex" value="#ffffff" style="width:100px;" />
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Error correction</label>
+              <select class="form-select" id="errorLevel" style="max-width:200px;">
+                <option value="L">L — Low (7%)</option>
+                <option value="M" selected>M — Medium (15%)</option>
+                <option value="Q">Q — Quartile (25%)</option>
+                <option value="H">H — High (30%)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Size</label>
+              <div class="range-group">
+                <input type="range" id="qrSize" min="128" max="1024" step="64" value="512" />
+                <span class="range-value" id="qrSizeVal">512px</span>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="generateBtn">▦ Generate QR</button>
+          </div>
+        </div>
+
+        <!-- Right: Preview -->
+        <div class="panel" id="previewPanel">
+          <div class="panel-title">Preview</div>
+          <div id="qrPlaceholder" style="height:300px;display:flex;align-items:center;justify-content:center;color:var(--slate-600);font-family:var(--font-mono);font-size:0.85rem;">
+            QR code will appear here
+          </div>
+          <canvas id="qrCanvas" style="display:none;max-width:100%;border-radius:var(--radius-md);"></canvas>
+          <div id="downloadActions" class="btn-group mt-16" style="display:none;">
+            <button class="btn btn-primary" id="dlPng">⬇️ PNG</button>
+            <button class="btn btn-secondary" id="dlSvg">⬇️ SVG</button>
+            <button class="btn btn-ghost" id="copyDataUrl">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+      <div id="alertArea" class="mt-16"></div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="footer-inner"><div class="footer-copy">© 2024 mdothree.com</div></div></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  
+  <script type="module" src="js/pages/generate.js"></script>
+  <script src="js/nav-toggle.js"></script>
+</body>
+</html>
