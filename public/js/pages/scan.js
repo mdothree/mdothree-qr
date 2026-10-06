@@ -20,13 +20,41 @@ const dropZone = document.getElementById('dropZone');
       return '📄 Text';
     }
 
+    function showAlert(type, msg) {
+      alertArea.innerHTML = '';
+      const div = document.createElement('div');
+      div.className = `alert alert-${type}`;
+      div.textContent = msg;
+      alertArea.appendChild(div);
+    }
+
+    function clearResult() {
+      // A failed decode used to leave the previous code's result visible
+      // next to the new image.
+      resultPanel.style.display = 'none';
+      document.getElementById('infoPanel').style.display = 'none';
+      decodedText.textContent = '';
+      openBtn.style.display = 'none';
+    }
+
+    // attemptBoth: also read light-on-dark (inverted) codes, which the
+    // generator on this site can produce.
+    function findCode(imageData) {
+      return jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+    }
+
     async function decodeImage(file) {
       alertArea.innerHTML = '';
+      clearResult();
+      if (!(file.type || '').startsWith('image/') && !/\.(png|jpe?g|gif|webp|bmp)$/i.test(file.name || '')) {
+        showAlert('error', "❌ That file isn't an image. Drop a screenshot or photo of a QR code.");
+        return;
+      }
       let bitmap;
       try {
-        bitmap = await createImageBitmap(file);
+        bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
       } catch (e) {
-        alertArea.innerHTML = `<div class="alert alert-error">❌ Could not load image: ${e.message}</div>`;
+        showAlert('error', `❌ Could not load image: ${e.message}`);
         return;
       }
       try {
@@ -39,7 +67,25 @@ const dropZone = document.getElementById('dropZone');
       previewCanvas.style.display = 'block';
 
       const imageData = ctx.getImageData(0, 0, previewCanvas.width, previewCanvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+      let code = findCode(imageData);
+      if (!code && scale < 1) {
+        // Small codes in large photos can be lost by the 1200px downscale:
+        // retry at full resolution (cap ~16MP to stay within canvas limits).
+        const full = document.createElement('canvas');
+        const fs = Math.min(1, Math.sqrt(16e6 / (bitmap.width * bitmap.height)));
+        full.width = Math.round(bitmap.width * fs); full.height = Math.round(bitmap.height * fs);
+        const fctx = full.getContext('2d');
+        fctx.drawImage(bitmap, 0, 0, full.width, full.height);
+        code = findCode(fctx.getImageData(0, 0, full.width, full.height));
+        if (code) {
+          // Map the outline back onto the preview canvas.
+          const k = previewCanvas.width / full.width;
+          for (const key of Object.keys(code.location)) {
+            const pt = code.location[key];
+            if (pt && typeof pt.x === 'number') code.location[key] = { x: pt.x * k, y: pt.y * k };
+          }
+        }
+      }
 
       if (code) {
         const text = code.data;
@@ -66,23 +112,24 @@ const dropZone = document.getElementById('dropZone');
         } else {
           openBtn.style.display = 'none';
         }
-        alertArea.innerHTML = `<div class="alert alert-success">✅ QR code decoded successfully.</div>`;
-        await saveToHistory('qr-scan', { contentType: detectContentType(text).type });
+        showAlert('success', '✅ QR code decoded successfully.');
+        // detectContentType returns a label string here (no .type property).
+        await saveToHistory('qr-scan', { contentType: detectContentType(text) });
       } else {
-        alertArea.innerHTML = `<div class="alert alert-error">❌ No QR code found in this image. Try a clearer image.</div>`;
+        showAlert('error', '❌ No QR code found in this image. Try a clearer or tighter-cropped image.');
       }
       } catch (e) {
-        alertArea.innerHTML = `<div class="alert alert-error">❌ Decode failed: ${e.message}</div>`;
+        showAlert('error', `❌ Decode failed: ${e.message}`);
       }
     }
 
-    fileInput.addEventListener('change', () => { if (fileInput.files[0]) decodeImage(fileInput.files[0]); });
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) decodeImage(fileInput.files[0]); fileInput.value = ''; });
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
     dropZone.addEventListener('drop', e => {
       e.preventDefault(); dropZone.classList.remove('dragover');
       const f = e.dataTransfer.files[0];
-      if (f?.type.startsWith('image/')) decodeImage(f);
+      if (f) decodeImage(f);
     });
 
     copyBtn.addEventListener('click', async () => {

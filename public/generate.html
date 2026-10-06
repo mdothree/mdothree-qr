@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generate QR Code — mdothree</title>
+  <title>Generate QR Code</title>
   <meta name="description" content="Create custom QR codes for URLs, WiFi networks, contacts, email, and SMS. Download as PNG or SVG." />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://mdothree.com/generate" />
+  <link rel="canonical" href="https://qr.mdothree.com/generate" />
   <!-- Open Graph -->
   <meta property="og:type"        content="website" />
-  <meta property="og:title"       content="Generate QR Code — mdothree" />
+  <meta property="og:title"       content="Generate QR Code" />
   <meta property="og:description" content="Create custom QR codes for URLs, WiFi networks, contacts, email, and SMS. Download as PNG or SVG." />
-  <meta property="og:url"         content="https://mdothree.com/generate" />
+  <meta property="og:url"         content="https://qr.mdothree.com/generate" />
   <meta property="og:site_name"   content="mdothree" />
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary" />
-  <meta name="twitter:title"       content="Generate QR Code — mdothree" />
+  <meta name="twitter:title"       content="Generate QR Code" />
   <meta name="twitter:description" content="Create custom QR codes for URLs, WiFi networks, contacts, email, and SMS. Download as PNG or SVG." />
   <!-- PWA -->
   <meta name="color-scheme" content="dark light" />
@@ -58,7 +58,7 @@
         <p>Create customized QR codes for any content type.</p>
       </div>
 
-      <div class="tool-layout" class="animate-fade-up-2">
+      <div class="tool-layout animate-fade-up-2">
         <!-- Left: Input -->
         <div>
           <div class="panel">
@@ -173,6 +173,7 @@
               </div>
             </div>
             <button class="btn btn-primary" id="generateBtn">▦ Generate QR</button>
+            <div id="alertArea" role="status" aria-live="polite"></div>
           </div>
         </div>
 
@@ -190,13 +191,12 @@
           </div>
         </div>
       </div>
-      <div id="alertArea" class="mt-16"></div>
     </div>
   </main>
 
   <footer class="footer"><div class="footer-inner"><div class="footer-copy">© 2024 mdothree.com</div></div></footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   
   <script type="module" src="js/pages/generate.js"></script>
   <script src="js/nav-toggle.js"></script>

@@ -11,6 +11,7 @@ import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-p
     const downloadAllWrap = document.getElementById('downloadAllWrap');
     const alertArea = document.getElementById('alertArea');
     let generatedCanvases = [];
+    let skippedLines = [];
 
     generateBtn.addEventListener('click', async () => {
       const lines = batchInput.value.split('\n').map(l => l.trim()).filter(Boolean);
@@ -25,6 +26,8 @@ import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-p
       try {
       previewGrid.innerHTML = '';
       generatedCanvases = [];
+      skippedLines = [];
+      downloadAllWrap.classList.add('hidden');
       progressWrap.classList.remove('hidden');
       alertArea.innerHTML = '';
 
@@ -66,12 +69,15 @@ import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-p
             const safeName = lines[i].replace(/[^a-z0-9]/gi, '_').slice(0, 40);
             a.href = url; a.download = `qr_${safeName}.png`; a.click();
           });
-          lbl.innerHTML = `<span>${lines[i].slice(0, 30)}${lines[i].length > 30 ? '…' : ''}</span>`;
+          const lblText = document.createElement('span');
+          lblText.textContent = lines[i].slice(0, 30) + (lines[i].length > 30 ? '…' : ''); // user data: text only
+          lbl.appendChild(lblText);
           lbl.appendChild(dlBtn);
           wrap.appendChild(prevCanvas); wrap.appendChild(lbl);
           previewGrid.appendChild(wrap);
         } catch (e) {
           console.warn(`Skipping "${lines[i]}": ${e.message}`);
+          skippedLines.push(i + 1);
         }
         await new Promise(r => setTimeout(r, 10));
       }
@@ -80,15 +86,22 @@ import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-p
       generateBtn.disabled = false;
       progressWrap.classList.add('hidden');
     }
-      downloadAllWrap.classList.remove('hidden');
-      alertArea.innerHTML = `<div class="alert alert-success">✅ Generated ${generatedCanvases.length} QR codes.</div>`;
+      if (generatedCanvases.length) downloadAllWrap.classList.remove('hidden');
+      alertArea.innerHTML = '';
+      const msg = document.createElement('div');
+      msg.className = skippedLines.length ? 'alert alert-warning' : 'alert alert-success';
+      msg.textContent = `✅ Generated ${generatedCanvases.length} QR code${generatedCanvases.length !== 1 ? 's' : ''}.` +
+        (skippedLines.length ? ` Skipped line${skippedLines.length > 1 ? 's' : ''} ${skippedLines.join(', ')} (too long to encode).` : '');
+      alertArea.appendChild(msg);
       await saveToHistory('qr-batch', { count: generatedCanvases.length });
     });
 
     document.getElementById('downloadAll').addEventListener('click', async () => {
       if (!generatedCanvases.length) return;
       try {
-        const { default: JSZip } = await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js');
+        // dist/jszip.min.js is UMD with no ES default export ("JSZip is not a
+        // constructor"); the +esm build exports the constructor as default.
+        const { default: JSZip } = await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');
         const zip = new JSZip();
         generatedCanvases.forEach(({ canvas, label }, i) => {
           const dataUrl = canvas.toDataURL('image/png');
@@ -98,8 +111,9 @@ import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-p
         });
         const blob = await zip.generateAsync({ type: 'blob' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = 'qrcodes.zip'; a.click();
-        URL.revokeObjectURL(url);
+        const a = document.createElement('a'); a.href = url; a.download = 'qrcodes.zip';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       } catch (e) {
         alertArea.innerHTML = `<div class="alert alert-error">❌ ZIP failed: ${e.message}</div>`;
       }

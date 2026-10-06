@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Batch QR Generator — mdothree</title>
+  <title>Batch QR Generator</title>
   <meta name="description" content="Generate multiple QR codes from a list. Download all as a ZIP file." />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://mdothree.com/batch" />
+  <link rel="canonical" href="https://qr.mdothree.com/batch" />
   <!-- Open Graph -->
   <meta property="og:type"        content="website" />
-  <meta property="og:title"       content="Batch QR Generator — mdothree" />
+  <meta property="og:title"       content="Batch QR Generator" />
   <meta property="og:description" content="Generate multiple QR codes from a list. Download all as a ZIP file." />
-  <meta property="og:url"         content="https://mdothree.com/batch" />
+  <meta property="og:url"         content="https://qr.mdothree.com/batch" />
   <meta property="og:site_name"   content="mdothree" />
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary" />
-  <meta name="twitter:title"       content="Batch QR Generator — mdothree" />
+  <meta name="twitter:title"       content="Batch QR Generator" />
   <meta name="twitter:description" content="Generate multiple QR codes from a list. Download all as a ZIP file." />
   <!-- PWA -->
   <meta name="color-scheme" content="dark light" />
@@ -61,7 +61,7 @@
       <div class="alert alert-info animate-fade-up" id="freeBanner" style="margin-bottom:20px;">
         ℹ️ <strong>Free plan:</strong> Generate up to 5 QR codes at once. <a href="#" onclick="requirePremium('Batch QR generation','qr-batch');return false;" style="color:var(--emerald);text-decoration:none;margin-left:8px;">Upgrade for 1,000+ →</a>
       </div>
-      <div class="tool-layout" class="animate-fade-up-2">
+      <div class="tool-layout animate-fade-up-2">
         <div>
           <div class="panel">
             <div class="panel-title">Input</div>
@@ -88,6 +88,7 @@
               </select>
             </div>
             <button class="btn btn-primary w-full" id="generateBtn">▦ Generate All QR Codes</button>
+            <div id="alertArea" role="status" aria-live="polite"></div>
           </div>
         </div>
 
@@ -105,13 +106,12 @@
           </div>
         </div>
       </div>
-      <div id="alertArea" class="mt-16"></div>
     </div>
   </main>
 
   <footer class="footer"><div class="footer-inner"><div class="footer-copy">© 2024 mdothree.com</div></div></footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   
   <script type="module" src="js/pages/batch.js"></script>
   <script src="js/nav-toggle.js"></script>

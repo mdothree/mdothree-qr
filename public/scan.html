@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scan QR Code — mdothree</title>
+  <title>Scan QR Code</title>
   <meta name="description" content="Upload an image to decode any QR code. Detects URLs, WiFi credentials, vCards, and more." />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://mdothree.com/scan" />
+  <link rel="canonical" href="https://qr.mdothree.com/scan" />
   <!-- Open Graph -->
   <meta property="og:type"        content="website" />
-  <meta property="og:title"       content="Scan QR Code — mdothree" />
+  <meta property="og:title"       content="Scan QR Code" />
   <meta property="og:description" content="Upload an image to decode any QR code. Detects URLs, WiFi credentials, vCards, and more." />
-  <meta property="og:url"         content="https://mdothree.com/scan" />
+  <meta property="og:url"         content="https://qr.mdothree.com/scan" />
   <meta property="og:site_name"   content="mdothree" />
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary" />
-  <meta name="twitter:title"       content="Scan QR Code — mdothree" />
+  <meta name="twitter:title"       content="Scan QR Code" />
   <meta name="twitter:description" content="Upload an image to decode any QR code. Detects URLs, WiFi credentials, vCards, and more." />
   <!-- PWA -->
   <meta name="color-scheme" content="dark light" />
@@ -58,7 +58,7 @@
         <p>Upload any image containing a QR code to decode it.</p>
       </div>
 
-      <div class="tool-layout" class="animate-fade-up-2">
+      <div class="tool-layout animate-fade-up-2">
         <div class="panel">
           <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Drop an image with a QR code or click to browse">
             <input type="file" id="fileInput" accept="image/*" />
@@ -66,6 +66,7 @@
             <div class="drop-zone-title">Drop image with QR code</div>
             <div class="drop-zone-sub">JPG, PNG, WebP, GIF</div>
           </div>
+          <div id="alertArea" role="status" aria-live="polite"></div>
           <canvas id="previewCanvas" style="display:none;max-width:100%;border-radius:var(--radius-md);margin-top:16px;"></canvas>
         </div>
 
@@ -90,7 +91,6 @@
           </div>
         </div>
       </div>
-      <div id="alertArea" class="mt-16"></div>
     </div>
   </main>
 

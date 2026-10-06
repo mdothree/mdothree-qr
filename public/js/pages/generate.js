@@ -1,5 +1,5 @@
 // Page controller: generate.html
-import { buildQRContent } from '../services/qrGenerator.js';
+import { buildQRContent, validateQRFields } from '../services/qrGenerator.js';
 import { saveToHistory } from '../config/firebase.js';
 
     let currentType = 'url';
@@ -33,9 +33,17 @@ import { saveToHistory } from '../config/firebase.js';
     const downloadActions = document.getElementById('downloadActions');
     const alertArea = document.getElementById('alertArea');
 
-    generateBtn.addEventListener('click', async () => {
-      generateBtn.disabled = true;
-      const content = buildQRContent(currentType, {
+    function showAlert(type, msg) {
+      alertArea.innerHTML = '';
+      if (!msg) return;
+      const div = document.createElement('div');
+      div.className = `alert alert-${type}`;
+      div.textContent = msg;
+      alertArea.appendChild(div);
+    }
+
+    function readFields() {
+      return {
         url: document.getElementById('urlInput')?.value,
         text: document.getElementById('textInput')?.value,
         wifiSSID: document.getElementById('wifiSSID')?.value,
@@ -53,45 +61,67 @@ import { saveToHistory } from '../config/firebase.js';
         emailBody: document.getElementById('emailBody')?.value,
         smsPhone: document.getElementById('smsPhone')?.value,
         smsMsg: document.getElementById('smsMsg')?.value,
-      });
+      };
+    }
 
-      if (!content.trim()) {
-        alertArea.innerHTML = `<div class="alert alert-error">❌ Please fill in the required fields.</div>`;
-        return;
-      }
+    // Exactly what the preview canvas encodes, so SVG export matches it.
+    let lastRender = null;
 
+    generateBtn.addEventListener('click', async () => {
+      const fields = readFields();
+      // Validate before disabling the button: the old early return skipped
+      // the finally block and left Generate disabled until reload.
+      const invalid = validateQRFields(currentType, fields);
+      if (invalid) { showAlert('error', `❌ ${invalid}`); return; }
+      const content = buildQRContent(currentType, fields);
+
+      generateBtn.disabled = true;
       try {
-        const size = parseInt(qrSizeSlider.value);
-        await QRCode.toCanvas(qrCanvas, content, {
-          width: size,
+        const opts = {
+          width: parseInt(qrSizeSlider.value),
           color: { dark: fgColor.value, light: bgColor.value },
           errorCorrectionLevel: document.getElementById('errorLevel').value,
           margin: 2,
-        });
+        };
+        await QRCode.toCanvas(qrCanvas, content, opts);
+        lastRender = { content, opts, type: currentType };
         qrCanvas.style.display = 'block';
         qrPlaceholder.style.display = 'none';
         downloadActions.style.display = 'flex';
+        showAlert('', '');
         await saveToHistory('qr-generate', { type: currentType });
-        alertArea.innerHTML = '';
       } catch (err) {
-        alertArea.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+        const tooBig = /too big|amount of data/i.test(err.message || '');
+        showAlert('error', tooBig
+          ? '❌ Too much content for one QR code at this error-correction level. Shorten it or choose a lower level (L or M).'
+          : `❌ ${err.message}`);
       } finally {
         generateBtn.disabled = false;
       }
     });
 
+    function downloadUrl(url, name, revoke = false) {
+      const a = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      if (revoke) setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
     document.getElementById('dlPng').addEventListener('click', () => {
-      const url = qrCanvas.toDataURL('image/png');
-      const a = document.createElement('a'); a.href = url; a.download = 'qrcode.png'; a.click();
+      downloadUrl(qrCanvas.toDataURL('image/png'), `qrcode-${lastRender?.type || 'code'}.png`);
     });
 
     document.getElementById('dlSvg').addEventListener('click', async () => {
-      const content = qrCanvas.dataset.content || document.getElementById('urlInput').value;
-      const svgStr = await QRCode.toString(content, { type: 'svg', color: { dark: fgColor.value, light: bgColor.value }, errorCorrectionLevel: document.getElementById('errorLevel').value });
-      const blob = new Blob([svgStr], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'qrcode.svg'; a.click();
-      URL.revokeObjectURL(url);
+      // Previously read qrCanvas.dataset.content (never set) and fell back to
+      // the URL field, so WiFi/vCard/text SVGs encoded different data.
+      if (!lastRender) return;
+      try {
+        const svgStr = await QRCode.toString(lastRender.content, { ...lastRender.opts, type: 'svg' });
+        const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+        downloadUrl(URL.createObjectURL(blob), `qrcode-${lastRender.type}.svg`, true);
+      } catch (err) {
+        showAlert('error', `❌ SVG export failed: ${err.message}`);
+      }
     });
 
     document.getElementById('copyDataUrl').addEventListener('click', async () => {
