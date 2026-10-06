@@ -1,4 +1,6 @@
 // Page controller: scan.html
+import { saveToHistory } from '../config/firebase.js';
+
 const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const previewCanvas = document.getElementById('previewCanvas');
@@ -68,6 +70,7 @@ const dropZone = document.getElementById('dropZone');
         await saveToHistory('qr-scan', { contentType: detectContentType(text).type });
       } else {
         alertArea.innerHTML = `<div class="alert alert-error">❌ No QR code found in this image. Try a clearer image.</div>`;
+      }
       } catch (e) {
         alertArea.innerHTML = `<div class="alert alert-error">❌ Decode failed: ${e.message}</div>`;
       }
