@@ -149,22 +149,22 @@
             <div class="panel-title">Appearance</div>
             <div class="tool-layout">
               <div class="form-group">
-                <label class="form-label">Foreground color</label>
+                <label class="form-label" for="fgColor">Foreground color</label>
                 <div class="color-input-group">
                   <input type="color" id="fgColor" value="#000000" />
-                  <input type="text" class="form-input" id="fgColorHex" value="#000000" style="width:100px;" />
+                  <input aria-label="Foreground color hex value" type="text" class="form-input" id="fgColorHex" value="#000000" style="width:100px;" />
                 </div>
               </div>
               <div class="form-group">
-                <label class="form-label">Background color</label>
+                <label class="form-label" for="bgColor">Background color</label>
                 <div class="color-input-group">
                   <input type="color" id="bgColor" value="#ffffff" />
-                  <input type="text" class="form-input" id="bgColorHex" value="#ffffff" style="width:100px;" />
+                  <input aria-label="Background color hex value" type="text" class="form-input" id="bgColorHex" value="#ffffff" style="width:100px;" />
                 </div>
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Error correction</label>
+              <label class="form-label" for="errorLevel">Error correction</label>
               <select class="form-select" id="errorLevel" style="max-width:200px;">
                 <option value="L">L — Low (7%)</option>
                 <option value="M" selected>M — Medium (15%)</option>
@@ -173,7 +173,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Size</label>
+              <label class="form-label" for="qrSize">Size</label>
               <div class="range-group">
                 <input type="range" id="qrSize" min="128" max="1024" step="64" value="512" />
                 <span class="range-value" id="qrSizeVal">512px</span>
