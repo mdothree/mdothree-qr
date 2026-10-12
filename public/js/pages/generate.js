@@ -92,8 +92,13 @@ import { saveToHistory } from '../config/firebase.js';
         await saveToHistory('qr-generate', { type: currentType });
       } catch (err) {
         const tooBig = /too big|amount of data/i.test(err.message || '');
+        // C7B-QR-COPY: only suggest levels lower than the one selected (none below L).
+        const lvl = document.getElementById('errorLevel').value;
+        const lower = { H: 'Q, M or L', Q: 'M or L', M: 'L' }[lvl];
         showAlert('error', tooBig
-          ? '❌ Too much content for one QR code at this error-correction level. Shorten it or choose a lower level (L or M).'
+          ? (lower
+              ? `❌ Too much content for one QR code at error-correction level ${lvl}. Shorten it or choose a lower level (${lower}).`
+              : '❌ Too much content for one QR code, even at the lowest error-correction level (L). Shorten it.')
           : `❌ ${err.message}`);
       } finally {
         generateBtn.disabled = false;
