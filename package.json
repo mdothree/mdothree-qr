@@ -1,7 +1,7 @@
 {
   "name": "mdothree-qr",
   "version": "1.0.0",
-  "description": "QR Code Tools \u2014 generate, scan, batch. Free & client-side.",
+  "description": "QR Code Tools \u2014 generate, scan, batch. Client-side.",
   "private": true,
   "type": "module",
   "scripts": {
