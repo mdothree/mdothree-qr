@@ -1,5 +1,5 @@
 // Page controller: batch.html
-import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
+import { initPaywall, isPremium, requirePremium, OPEN_LIMITS } from '../stripe-paywall.js';
     import { saveToHistory } from '../config/firebase.js';
     initPaywall();
     const generateBtn = document.getElementById('generateBtn');
@@ -16,7 +16,7 @@ import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-p
     generateBtn.addEventListener('click', async () => {
       const lines = batchInput.value.split('\n').map(l => l.trim()).filter(Boolean);
       if (!lines.length) { alertArea.innerHTML = '<div class="alert alert-error">❌ Enter at least one item.</div>'; return; }
-      if (!isPremium() && lines.length > FREE_LIMITS.qrBatch) {
+      if (!isPremium() && lines.length > OPEN_LIMITS.qrBatch) {
         requirePremium('Generating more than 5 QR codes at once', 'qr-batch');
         return;
       }
@@ -51,7 +51,7 @@ import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-p
 
           // Add to preview grid
           const wrap = document.createElement('div');
-          wrap.style.cssText = 'background:var(--slate-800);border:1px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;';
+          wrap.style.cssText = 'background:var(--slate-800);border:1px solid rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;';
           const prevCanvas = document.createElement('canvas');
           const s = 200 / size;
           prevCanvas.width = Math.round(size * Math.min(1, s));
